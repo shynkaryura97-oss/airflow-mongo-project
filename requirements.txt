@@ -3,3 +3,4 @@
 # ... (тут могут быть другие пакеты, оставь их)
 pandas
 pymongo
+apache-airflow-providers-mongo
