@@ -12,10 +12,10 @@ from airflow.models.dataset import Dataset
 # --- 1. Константы ---
 # Путь к файлу, который мы ждем (внутри Docker-контейнера)
 # /opt/airflow/ - это "домашняя" папка проекта в Docker
-FILE_TO_PROCESS = '/opt/airflow/include/airflow_data.csv'
+FILE_TO_PROCESS = '/usr/local/airflow/include/airflow_data.csv'
 
 # Путь, куда сохраним очищенные данные
-CLEANED_FILE_PATH = '/opt/airflow/include/cleaned_data.csv'
+CLEANED_FILE_PATH = '/usr/local/airflow/include/cleaned_data.csv'
 
 # Объявляем "Набор данных", который будет "сигналом" для DAG 2
 MONGO_READY_DATASET = Dataset("mongo_ready_data")
@@ -38,9 +38,9 @@ def data_processing_dag():
     wait_for_file = FileSensor(
         task_id="wait_for_file",
         filepath=FILE_TO_PROCESS,
-        mode="reschedule",    # Важно! "reschedule" освобождает воркер, пока ждет
-        poke_interval=30,     # Проверять каждые 30 сек
-        timeout=60 * 5,       # "Упасть" с ошибкой через 5 минут
+        mode="reschedule",
+        poke_interval=30,
+        timeout=60 * 5,
     )
 
     # --- 3. ЗАДАЧА: Ветвление (Branching) ---
@@ -53,7 +53,7 @@ def data_processing_dag():
         """
         if os.path.getsize(file_path) > 0:
             # Имя задачи должно совпадать с task_id или group_id
-            return "process_data_group"
+            return "process_data_group.load_to_pandas"
         else:
             return "log_empty_file"
 
